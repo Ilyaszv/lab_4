@@ -1,13 +1,138 @@
-import { Button, Center, Text, Stack } from '@chakra-ui/react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react' 
+import { 
+    chakra, 
+    Button, 
+    List, 
+    ListItem, 
+    Heading, 
+    Flex, 
+    Input, 
+    Text, 
+} from '@chakra-ui/react' 
+ 
+export const Home = () => { 
+    const [todo, setTodos] = useState([]) 
+    const [text, setText] = useState('')
+    const [filtered, setFiltred] = useState(todo)
 
-export const Home = () => (
-    <Center h="100vh">
-        <Stack>
-            <Text textAlign="center">Старница Home</Text>
-            <Button as={Link} to="/asdfg" colorScheme="blue">
-                Перейти на страницу 404
-            </Button>
-        </Stack>
-    </Center>
-)
+
+    useEffect( ()=>{
+        setFiltred(todo)
+    }, [todo])
+    
+    function todoFilter(status) {
+        if(status === 'all') {
+            setFiltred(todo)
+        } else {
+            let removeTodo = [...todo].filter( item => item.status === status)
+            setFiltred(removeTodo)
+        }
+    }
+
+    const createTodoHandler = (text) => { 
+        setTodos((prevState) => [...prevState, { id: Date.now(), text }]) 
+        setText('') 
+    } 
+ 
+    const removeTodoHandler = (id) => { 
+        setTodos((prevState) => prevState.filter((todo) => todo.id !== id))
+        
+    } 
+ 
+    return ( 
+        <Flex 
+            flexDirection="column" 
+            h="100vh" 
+            w="100vw" 
+            m="1rem" 
+            gap="1rem" 
+            alignItems="center" 
+        > 
+            <Heading textTransform="uppercase">Todo List</Heading> 
+            <List 
+                h="60vh" 
+                w="70vw" 
+                display="flex" 
+                flexDirection="column" 
+                overflowY="scroll" 
+                border="2px solid black" 
+                borderRadius="md" 
+                p="10px" 
+            >
+                {filtered.map((todo) => ( 
+                    <ListItem 
+                        key={todo.id} 
+                        display="flex" 
+                        justifyContent="space-between" 
+                        alignItems="center" 
+                        borderBottom="1px solid gray" 
+                        py="8px" 
+                    > 
+                        <Text>{todo.text}</Text> 
+                        <Button 
+                            onClick={() => removeTodoHandler(todo.id)} 
+                            type="submit"
+                            background="red.500" 
+                            color="white" 
+                            _hover={{ 
+                                background: 'red.600', 
+                            }} 
+                        >
+                            Удалить 
+                        </Button> 
+                    </ListItem> 
+                ))} 
+            </List> 
+            <chakra.form 
+                onSubmit={(e) => { 
+                    e.preventDefault() 
+                    createTodoHandler(text) 
+                }} 
+                display="flex" 
+                flexDirection="column" 
+                alignItems="center" 
+                gap="20px"
+            > 
+                <Input 
+                    placeholder="Напишите задачу..." 
+                    maxLength={80} 
+                    value={text} 
+                    onChange={(e) => setText(e.target.value)} 
+                    w="300px" 
+                    h="32px" 
+                /> 
+                <Button 
+                    type="submit" 
+                    w="fit-content" 
+                    background="blue.500" 
+                    color="white" 
+                    _hover={{ 
+                        background: 'blue.600', 
+                    }} 
+                > 
+                    Добавить задачу 
+                </Button>
+
+                <Button onClick={()=>todoFilter('all')}
+                    
+                    background="blue.500" 
+                    color="white" 
+                    _hover={{ 
+                        background: 'blue.600', 
+                    }} 
+                >
+                     Все </Button>
+
+                <Button onClick={()=>todoFilter(true)}
+                    background="red.500" 
+                            color="white" 
+                            _hover={{ 
+                                background: 'red.600', 
+                            }} 
+                
+                > Удалённые </Button>
+
+            </chakra.form> 
+        </Flex> 
+    ) 
+}     
